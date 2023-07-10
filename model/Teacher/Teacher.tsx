@@ -1,8 +1,10 @@
-import { Prisma, PrismaClient } from "../../prisma/generated"
- const prisma = new PrismaClient();
+import { PrismaClient } from "@prisma/client";
+
+
+const prisma = new PrismaClient();
 export const create =async (firstName:string,lastName:string,email:string,phone:string,password:string,gender:string,dob:string,department:string,joiningData:string,designation:string) => {
     try{
-        var createTeacher:Prisma.TeacherMasterCreateInput;
+        // var createTeacher:Prisma.TeacherMasterCreateInput;
         // createTeacher = {
         //     firstName:firstName,
         //     lastName:lastName,

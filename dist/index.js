@@ -30,6 +30,7 @@ const express_1 = __importDefault(require("express"));
 const dotenv = __importStar(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
+const routes_1 = require("./routes");
 dotenv.config();
 const app = (0, express_1.default)();
 app.use((0, helmet_1.default)());
@@ -39,6 +40,7 @@ const PORT = process.env.PORT || 8000;
 app.get("/", (req, res) => {
     res.send("Hello Typescript with Node.js!!!");
 });
+app.use('/api', routes_1.APIRoutes);
 app.listen(PORT, () => {
     console.log(`Server Running here 👉 http://localhost:${PORT}`);
 });

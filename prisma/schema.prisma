@@ -1,80 +1,80 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["multiSchema"]
-  output          = "./generated"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["public", "users", "locations", "students", "teacher", "classroom", "library", "accounts", "activity", "school", "website", "blogs", "courses", "products", "sales", "master"]
+  schemas  = ["public", "users", "locations", "students", "teacher", "classroom", "library", "accounts", "activity", "school", "website", "blogs", "courses", "products", "sales", "exam"]
 }
 
-model Designation {
-  id           String         @id @default(uuid()) @db.Uuid
-  roles        String         @unique
-  status       Boolean
-  createAt     DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  SalesTeam    SalesTeam[]
-  TeacherMaster TeacherMaster[]
+model designation {
+  id        String      @id @default(uuid()) @db.Uuid
+  roles     String      @unique
+  status    Boolean
+  createAt  DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  salesTeam salesTeam[]
 
-  @@schema("master")
+  @@schema("public")
 }
 
-model Country {
+model country {
   id                  String                @id @default(uuid()) @db.Uuid
   CounrtyName         String                @unique
   status              Boolean
   createAt            DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
-  State               State[]
-  StudentAddress      StudentAddress[]
-  TeacherAddress      TeacherAddress[]
-  SalesTeamAddress    SalesTeamAddress[]
-  SchoolMasterAddress SchoolMasterAddress[]
+  state               state[]
+  studentAddress      studentAddress[]
+  teacherAddress      teacherAddress[]
+  salesTeamAddress    salesTeamAddress[]
+  schoolMasterAddress schoolMasterAddress[]
 
   @@schema("locations")
 }
 
-model State {
+model state {
   id                  String                @id @default(uuid()) @db.Uuid
-  StateName           String                @unique
-  Country             Country               @relation(fields: [fkCountryId], references: [id])
+  stateName           String                @unique
+  country             country               @relation(fields: [fkCountryId], references: [id])
   fkCountryId         String                @db.Uuid
   status              Boolean
   createAt            DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
-  City                City[]
-  StudentAddress      StudentAddress[]
-  TeacherAddress      TeacherAddress[]
-  SalesTeamAddress    SalesTeamAddress[]
-  SchoolMasterAddress SchoolMasterAddress[]
+  city                city[]
+  studentAddress      studentAddress[]
+  teacherAddress      teacherAddress[]
+  salesTeamAddress    salesTeamAddress[]
+  schoolMasterAddress schoolMasterAddress[]
 
-  @@schema("locations")
   @@index([fkCountryId])
+  @@schema("locations")
 }
 
-model City {
+model city {
   id                  String                @id @default(uuid()) @db.Uuid
-  CityName            String
-  State               State                 @relation(fields: [fkStateId], references: [id])
-  fkStateId           String                @db.Uuid
+  cityName            String
+  state               state                 @relation(fields: [fkstateId], references: [id])
+  fkstateId           String                @db.Uuid
   status              Boolean
   createAt            DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
-  StudentAddress      StudentAddress[]
-  TeacherAddress      TeacherAddress[]
-  SalesTeamAddress    SalesTeamAddress[]
-  SchoolMasterAddress SchoolMasterAddress[]
+  studentAddress      studentAddress[]
+  teacherAddress      teacherAddress[]
+  salesTeamAddress    salesTeamAddress[]
+  schoolMasterAddress schoolMasterAddress[]
 
+  @@index([fkstateId])
   @@schema("locations")
- @@index([fkStateId])
 }
 
-model Admin {
+model admin {
   id        String   @id @default(uuid()) @db.Uuid
-  email     String @unique
+  name      String
+  email     String   @unique
+  phone     String   @unique
   password  String
   status    Boolean
   createAt  DateTime @default(now())
@@ -83,30 +83,31 @@ model Admin {
   @@schema("users")
 }
 
-model SalesTeam {
+model salesTeam {
   id                 String               @id @default(uuid()) @db.Uuid
+  name               String
   email              String               @unique
   phone              String               @unique
   password           String
   dob                DateTime             @db.Date
-  designation        Designation          @relation(fields: [fkDesignationId], references: [id])
-  fkDesignationId    String               @db.Uuid
+  designation        designation          @relation(fields: [fkdesignationId], references: [id])
+  fkdesignationId    String               @db.Uuid
   status             Boolean
   createAt           DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
-  SalesTeamDocuments SalesTeamDocuments[]
-  SalesTeamAddress   SalesTeamAddress[]
+  salesTeamDocuments salesTeamDocuments[]
+  salesTeamAddress   salesTeamAddress[]
   schoolMaster       schoolMaster[]
+  TeacherTagging     TeacherTagging[]
 
   @@schema("sales")
 }
 
-model SalesTeamDocuments {
+model salesTeamDocuments {
   id            String    @id @default(uuid()) @db.Uuid
-  salesTeam     SalesTeam @relation(fields: [fkSalesTeamId], references: [id])
-  fkSalesTeamId String    @db.Uuid
+  salesTeam     salesTeam @relation(fields: [fksalesTeamId], references: [id])
+  fksalesTeamId String    @db.Uuid
   category      String
-  comment       String
   url           String
   status        Boolean
   createAt      DateTime  @default(now())
@@ -115,16 +116,16 @@ model SalesTeamDocuments {
   @@schema("sales")
 }
 
-model SalesTeamAddress {
+model salesTeamAddress {
   id            String    @id @default(uuid()) @db.Uuid
-  salesTeam     SalesTeam @relation(fields: [fkSalesTeamId], references: [id])
-  fkSalesTeamId String    @db.Uuid
-  Country       Country   @relation(fields: [fkCountryId], references: [id])
-  fkCountryId   String    @db.Uuid
-  State         State     @relation(fields: [fkStateId], references: [id])
-  fkStateId     String    @db.Uuid
-  City          City      @relation(fields: [fkCityId], references: [id])
-  fkCityId      String    @db.Uuid
+  salesTeam     salesTeam @relation(fields: [fksalesTeamId], references: [id])
+  fksalesTeamId String    @db.Uuid
+  country       country   @relation(fields: [fkcountryId], references: [id])
+  fkcountryId   String    @db.Uuid
+  state         state     @relation(fields: [fkstateId], references: [id])
+  fkstateId     String    @db.Uuid
+  city          city      @relation(fields: [fkcityId], references: [id])
+  fkcityId      String    @db.Uuid
   Address       String
   status        Boolean
   createAt      DateTime  @default(now())
@@ -133,9 +134,9 @@ model SalesTeamAddress {
   @@schema("teacher")
 }
 
-model SchoolBoard {
+model schoolBoard {
   id           String         @id @default(uuid()) @db.Uuid
-  boardname    String   @unique
+  boardname    String         @unique
   status       Boolean
   createAt     DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -146,7 +147,7 @@ model SchoolBoard {
 
 model schoolType {
   id           String         @id @default(uuid()) @db.Uuid
-  schoolType   String   @unique
+  schoolType   String         @unique
   status       Boolean
   createAt     DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -158,31 +159,32 @@ model schoolType {
 model schoolMaster {
   id                  String                @id @default(uuid()) @db.Uuid
   name                String
-  afflicationCode     String      
+  afflicationCode     String
   schoolType          schoolType            @relation(fields: [fkSchoolType], references: [id])
   fkSchoolType        String                @db.Uuid
-  schoolBoard         SchoolBoard           @relation(fields: [fkSchoolBoard], references: [id])
-  fkSchoolBoard       String                @db.Uuid
-  salesTeam           SalesTeam             @relation(fields: [fkSalesTeamId], references: [id])
-  fkSalesTeamId       String                @db.Uuid
+  schoolBoard         schoolBoard           @relation(fields: [fkschoolBoard], references: [id])
+  fkschoolBoard       String                @db.Uuid
+  salesTeam           salesTeam             @relation(fields: [fksalesTeamId], references: [id])
+  fksalesTeamId       String                @db.Uuid
   status              Boolean
   createAt            DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
-  SchoolMasterAddress SchoolMasterAddress[]
+  schoolMasterAddress schoolMasterAddress[]
+  TeacherTagging      TeacherTagging[]
 
   @@schema("school")
 }
 
-model SchoolMasterAddress {
+model schoolMasterAddress {
   id          String       @id @default(uuid()) @db.Uuid
   schoolId    schoolMaster @relation(fields: [fkSchoolId], references: [id])
   fkSchoolId  String       @db.Uuid
-  Country     Country      @relation(fields: [fkCountryId], references: [id])
-  fkCountryId String       @db.Uuid
-  State       State        @relation(fields: [fkStateId], references: [id])
-  fkStateId   String       @db.Uuid
-  City        City         @relation(fields: [fkCityId], references: [id])
-  fkCityId    String       @db.Uuid
+  country     country      @relation(fields: [fkcountryId], references: [id])
+  fkcountryId String       @db.Uuid
+  state       state        @relation(fields: [fkstateId], references: [id])
+  fkstateId   String       @db.Uuid
+  city        city         @relation(fields: [fkcityId], references: [id])
+  fkcityId    String       @db.Uuid
   Address     String
   status      Boolean
   createAt    DateTime     @default(now())
@@ -191,32 +193,34 @@ model SchoolMasterAddress {
   @@schema("school")
 }
 
-model Classmaster {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String  @unique
-  status    Boolean
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model classmaster {
+  id             String           @id @default(uuid()) @db.Uuid
+  name           String           @unique
+  status         Boolean
+  createAt       DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  questionMaster questionMaster[]
 
   @@schema("public")
 }
 
 model Subjectmaster {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String @unique
-  status    Boolean
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String           @id @default(uuid()) @db.Uuid
+  name           String           @unique
+  status         Boolean
+  createAt       DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  questionMaster questionMaster[]
 
   @@schema("public")
 }
 
-model StudentMaster {
+model studentMaster {
   id          String   @id @default(uuid()) @db.Uuid
   firstName   String
   lastName    String
   email       String   @unique
-  phone       String    
+  phone       String   @unique
   password    String
   dob         DateTime @db.Date
   admissionId String   @unique
@@ -227,21 +231,21 @@ model StudentMaster {
   status         Boolean
   createAt       DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
-  StudentDetail  StudentDocuments[]
-  StudentAddress StudentAddress[]
-  StudentParents StudentParents[]
+  studentDetail  studentDocuments[]
+  studentAddress studentAddress[]
+  studentParents studentParents[]
 
   @@schema("students")
 }
 
-model StudentParents {
+model studentParents {
   id          String        @id @default(uuid()) @db.Uuid
-  StudentId   StudentMaster @relation(fields: [fkStudentId], references: [id])
+  StudentId   studentMaster @relation(fields: [fkStudentId], references: [id])
   fkStudentId String        @db.Uuid
   name        String
   relation    String
-  phone       String    @unique
-  email       String    @unique
+  phone       String        @unique
+  email       String        @unique
   status      Boolean
   createAt    DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -249,9 +253,9 @@ model StudentParents {
   @@schema("students")
 }
 
-model StudentDocuments {
+model studentDocuments {
   id          String        @id @default(uuid()) @db.Uuid
-  StudentId   StudentMaster @relation(fields: [fkStudentId], references: [id])
+  StudentId   studentMaster @relation(fields: [fkStudentId], references: [id])
   fkStudentId String        @db.Uuid
   category    String
   docUrl      String
@@ -262,16 +266,16 @@ model StudentDocuments {
   @@schema("students")
 }
 
-model StudentAddress {
+model studentAddress {
   id          String        @id @default(uuid()) @db.Uuid
-  StudentId   StudentMaster @relation(fields: [fkStudentId], references: [id])
+  StudentId   studentMaster @relation(fields: [fkStudentId], references: [id])
   fkStudentId String        @db.Uuid
-  Country     Country       @relation(fields: [fkCountryId], references: [id])
-  fkCountryId String        @db.Uuid
-  State       State         @relation(fields: [fkStateId], references: [id])
-  fkStateId   String        @db.Uuid
-  City        City          @relation(fields: [fkCityId], references: [id])
-  fkCityId    String        @db.Uuid
+  country     country       @relation(fields: [fkcountryId], references: [id])
+  fkcountryId String        @db.Uuid
+  state       state         @relation(fields: [fkstateId], references: [id])
+  fkstateId   String        @db.Uuid
+  city        city          @relation(fields: [fkcityId], references: [id])
+  fkcityId    String        @db.Uuid
   Address     String
   status      Boolean
   createAt    DateTime      @default(now())
@@ -280,95 +284,127 @@ model StudentAddress {
   @@schema("students")
 }
 
-model TeacherDepartment {
-  id           String         @id @default(uuid()) @db.Uuid
-  department   String         @unique
-  status       Boolean
-  createAt     DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  TeacherMaster TeacherMaster[]
+model teacherMaster {
+  id               String             @id @default(uuid()) @db.Uuid
+  firstName        String
+  lastName         String
+  email            String             @unique
+  phone            String             @unique
+  password         String
+  gender           String
+  dob              DateTime           @db.Date
+  profileImg       String
+  joiningDate      DateTime           @db.Date
+  status           Boolean
+  createAt         DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  teacherDocuments teacherDocuments[]
+  teacherAddress   teacherAddress[]
+  teacherExprience teacherExprience[]
+  TeacherTagging   TeacherTagging[]
 
   @@schema("teacher")
 }
 
-model TeacherMaster {
-  id                    String             @id @default(uuid()) @db.Uuid
-  firstName             String
-  lastName              String
-  email                 String             @unique
-  phone                 String              @unique
-  password              String
-  gender                String
-  dob                   DateTime           @db.Date
-  teacherId             String             @unique
-  Teacherdepartment     TeacherDepartment  @relation(fields: [fkTeacherDepartmentId], references: [id])
-  fkTeacherDepartmentId String             @db.Uuid
-  profileImg            String
-  joiningDate           DateTime           @db.Date
-  designation           Designation        @relation(fields: [fkDesignationId], references: [id])
-  fkDesignationId       String             @db.Uuid
-  status                Boolean
-  createAt              DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
-  TeacherDocuments      TeacherDocuments[]
-  TeacherAddress        TeacherAddress[]
-  TeacherExprience      TeacherExprience[]
-
-  @@schema("teacher")
-}
-
-model TeacherExprience {
-  id          String       @id @default(uuid()) @db.Uuid
-  TeacherId   TeacherMaster @relation(fields: [fkTeacherId], references: [id])
-  fkTeacherId String       @db.Uuid
+model teacherExprience {
+  id          String        @id @default(uuid()) @db.Uuid
+  TeacherId   teacherMaster @relation(fields: [fkTeacherId], references: [id])
+  fkTeacherId String        @db.Uuid
   skills      Json[]
   experience  String
   status      Boolean
-  createAt    DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createAt    DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@schema("teacher")
 }
 
-model TeacherDocuments {
-  id          String       @id @default(uuid()) @db.Uuid
-  TeacherId   TeacherMaster @relation(fields: [fkTeacherId], references: [id])
-  fkTeacherId String       @db.Uuid
+model teacherDocuments {
+  id          String        @id @default(uuid()) @db.Uuid
+  TeacherId   teacherMaster @relation(fields: [fkTeacherId], references: [id])
+  fkTeacherId String        @db.Uuid
   category    String
   docUrl      String
   status      Boolean
-  createAt    DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createAt    DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@schema("teacher")
 }
 
-// model TeacherHierarchy {
-//    id          String       @id @default(uuid()) @db.Uuid
-//   Teachermaster   TeacherMaster @relation("parent",fields: [fkTeacherId], references: [id])
-//   fkTeacherId String 
-//   fkSubTeacherId String
-//   status      Boolean
-//   createAt    DateTime     @default(now())
-//   updatedAt   DateTime     @updatedAt
+model TeacherTagging {
+  id            String        @id @default(uuid()) @db.Uuid
+  fkTeacherId   String        @db.Uuid
+  teacherMaster teacherMaster @relation(fields: [fkTeacherId], references: [id])
+  fkSchoolId    String        @db.Uuid
+  schoolMaster  schoolMaster  @relation(fields: [fkSchoolId], references: [id])
+  createAt      DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  salesTeam     salesTeam?    @relation(fields: [salesTeamId], references: [id])
+  salesTeamId   String?       @db.Uuid
 
-//   @@schema("teacher")
-// }
+  @@unique([fkSchoolId, fkTeacherId])
+  @@index([fkSchoolId])
+  @@schema("teacher")
+}
 
-model TeacherAddress {
-  id          String       @id @default(uuid()) @db.Uuid
-  TeacherId   TeacherMaster @relation(fields: [fkTeacherId], references: [id])
-  fkTeacherId String       @db.Uuid
-  Country     Country      @relation(fields: [fkCountryId], references: [id])
-  fkCountryId String       @db.Uuid
-  State       State        @relation(fields: [fkStateId], references: [id])
-  fkStateId   String         @db.Uuid
-  City        City         @relation(fields: [fkCityId], references: [id])
-  fkCityId    String       @db.Uuid
+model teacherAddress {
+  id          String        @id @default(uuid()) @db.Uuid
+  TeacherId   teacherMaster @relation(fields: [fkTeacherId], references: [id])
+  fkTeacherId String        @db.Uuid
+  country     country       @relation(fields: [fkcountryId], references: [id])
+  fkcountryId String        @db.Uuid
+  state       state         @relation(fields: [fkstateId], references: [id])
+  fkstateId   String        @db.Uuid
+  city        city          @relation(fields: [fkcityId], references: [id])
+  fkcityId    String        @db.Uuid
   Address     String
   status      Boolean
-  createAt    DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createAt    DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@schema("teacher")
+}
+
+model schoolLogin {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String   @unique
+  password  String
+  status    Boolean
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@schema("school")
+}
+
+model questionMaster {
+  id            String         @id @default(uuid()) @db.Uuid
+  fk_class_id   String         @db.Uuid
+  classMaster   classmaster    @relation(fields: [fk_class_id], references: [id])
+  fk_subject_id String         @db.Uuid
+  subjectMaster Subjectmaster  @relation(fields: [fk_subject_id], references: [id])
+  category      String
+  chapter       Int
+  question      String
+  status        Boolean        @default(true)
+  createAt      DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  answerMaster  answerMaster[]
+
+  @@unique([fk_class_id, fk_subject_id, category, chapter, question])
+  @@index([fk_subject_id])
+  @@schema("exam")
+}
+
+model answerMaster {
+  id             String         @id @default(uuid()) @db.Uuid
+  fk_question_id String         @db.Uuid
+  questionMaster questionMaster @relation(fields: [fk_question_id], references: [id])
+  option         String
+  createAt       DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([fk_question_id])
+  @@schema("exam")
 }
